@@ -1,44 +1,72 @@
-import java.awt.Rectangle;
+import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
-public class ObjectClient {
+public abstract class ObjectClient {
 	
-	DatagramSocket client = new DatagramSocket();
+	private DatagramSocket client = new DatagramSocket();
+	private InetAddress serverAddress;
+	private int serverPort;
 
-	public ObjectClient() throws Exception {
-		
-		int clientPort = 256;
-		
-		send(new Rectangle(50,50));
-		send(new Rectangle(40,30));
-		send(new Rectangle(69,69));
-		send(new Rectangle(69,69,69,69));
-		
-		client.close();
+	public ObjectClient(String ip, int port) throws Exception {
+		this.serverPort = port;
+		this.serverAddress = InetAddress.getByName(ip);
 	}
 	
-	public void send(Object obj) throws Exception{
-		ByteArrayOutputStream bao = new ByteArrayOutputStream(5000);
+	public void sendObject(Object obj) throws Exception{
+		ByteArrayOutputStream bao = new ByteArrayOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(bao);
 		
 		oos.flush();
 		oos.writeObject(obj);
 		oos.flush();
 		byte[] buffer = bao.toByteArray();
-		
-		//System.out.println(Arrays.toString(buffer));
-		
-		DatagramPacket pack = new DatagramPacket(buffer, buffer.length, InetAddress.getByName("localhost"), 255);
+
+		DatagramPacket pack = new DatagramPacket(buffer, buffer.length, serverAddress, serverPort);
 		client.send(pack);
 	}
 	
-
+	abstract void receivedPacket(Object o);
+	
 	public static void main(String[] args) throws Exception {
-		new ObjectClient();
+		new Tester();
 	}
 
 }
+
+class Tester{
+	
+	private boolean waitForAnswer = true;
+
+	public Tester() throws Exception{
+		String name = "Bob";
+		Color color = Color.blue;
+		//etc;
+		
+		ObjectClient client = new ObjectClient("localhost", 25565){
+
+			@Override
+			void receivedPacket(Object o) {
+				
+				if (o instanceof Answer){
+					
+//					if (yes)
+//						waitForAnswer = false;
+//					else
+//						client.sendObject(new JoinRequest(newName, newColor));
+				}
+			}
+		};
+		
+		client.sendObject(new JoinRequest(name, color));
+		
+		while (waitForAnswer ){
+			
+		}
+		
+	}
+}
+
