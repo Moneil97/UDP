@@ -3,6 +3,8 @@ import java.io.Serializable;
 
 public class Wrappers {}
 
+//All need to be Serializable
+
 @SuppressWarnings("serial")
 class JoinRequest implements Serializable{
 	
@@ -20,6 +22,10 @@ class JoinRequest implements Serializable{
 	public void setColor(Color color) {this.color = color;}
 }
 
-class Answer{
+class Answer implements Serializable{
+	
+}
+
+class HeartBeat implements Serializable{
 	
 }
