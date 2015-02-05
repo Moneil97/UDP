@@ -6,14 +6,21 @@ import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
 
 abstract public class UDPServer {
 
 	private int serverPort = 255;
 	private final int MAX_BUFFER_SIZE = 2000;
-	private DatagramSocket server = new DatagramSocket(serverPort);
+	private DatagramSocket server;
 	
-	public UDPServer() throws Exception {
+	public UDPServer(){
+		
+		try {
+			server = new DatagramSocket(serverPort);
+		} catch (SocketException e1) {
+			e1.printStackTrace();
+		}
 		
 		System.out.println("Server Running...");
 	

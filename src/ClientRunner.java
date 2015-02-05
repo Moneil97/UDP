@@ -6,19 +6,21 @@ import javax.swing.JFrame;
 @SuppressWarnings("serial")
 public class ClientRunner extends JFrame{
 
+	private String ip = "localhost";
+	private int serverPort = 255;
+	
 	private String[] names = "Bob Jim Sandra Guy James Joe".split(" ");
 	private Color[] colors = {Color.blue, Color.red, Color.green, Color.orange, Color.cyan};
 	private Player you = null;
 	private boolean waitForAnswer = true;
-	private int serverPort = 255;
 	private UDPClient client;
 
 	public ClientRunner() throws Exception {
 		
-		client = new UDPClient("localhost", serverPort){
+		client = new UDPClient(ip, serverPort){
 
 			@Override
-			void receivedPacket(Object object) {
+			void receivedPacket(Object object){
 				
 				say("Client Received: " + object);
 				

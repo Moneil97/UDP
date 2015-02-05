@@ -9,7 +9,7 @@ public class ServerRunner {
 	private UDPServer server;
 	private HashMap<Connection, Player> otherPlayers = new HashMap<Connection, Player>();
 	
-	public ServerRunner() throws Exception {
+	public ServerRunner(){
 		
 		server = new UDPServer() {
 
