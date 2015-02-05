@@ -10,6 +10,10 @@ public class Player {
 		data = new PlayerData(name, color);
 	}
 	
+	public Player(PlayerData playerdata) {
+		data = playerdata;
+	}
+
 	public PlayerData getPlayerData(){
 		return data;
 	}
@@ -56,5 +60,9 @@ class PlayerData implements Serializable{
 
 	public void setColor(Color color) {
 		this.color = color;
+	}
+	
+	public String toString(){
+		return "{PlayerData: " + name + " " + color + "}";
 	}
 }

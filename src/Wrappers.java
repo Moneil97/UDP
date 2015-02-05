@@ -1,4 +1,3 @@
-import java.awt.Color;
 import java.io.Serializable;
 import java.util.Arrays;
 
@@ -11,16 +10,12 @@ class JoinRequest implements Serializable{
 	
 	private PlayerData playerData;
 	
-	public JoinRequest(PlayerData playerData) {
-		this.setPlayerData(playerData);
-	}
-
-	public PlayerData getPlayerData() {
-		return playerData;
-	}
-
-	public void setPlayerData(PlayerData playerData) {
-		this.playerData = playerData;
+	public JoinRequest(PlayerData playerData) {this.setPlayerData(playerData);}
+	public PlayerData getPlayerData() {return playerData;}
+	public void setPlayerData(PlayerData playerData) {this.playerData = playerData;}
+	
+	public String toString(){
+		return "{JoinRequest: " + playerData + "}";
 	}
 }
 
@@ -45,11 +40,9 @@ class Answer implements Serializable{
 	public void setReasons(Reasons reasons[]) {this.reasons = reasons;}
 	
 	public String toString(){
-		return "Answer: " + response + (reasons == null ? "" : " " + Arrays.toString(reasons));
+		return "{Answer: " + response + (reasons == null ? "" : " " + Arrays.toString(reasons))  + "}";
 	}
 }
-
-
 
 @SuppressWarnings("serial")
 class HeartBeat implements Serializable{

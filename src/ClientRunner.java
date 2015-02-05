@@ -1,16 +1,21 @@
 import java.awt.Color;
+import java.util.Random;
 
+import javax.swing.JFrame;
 
-public class ClientRunner {
+@SuppressWarnings("serial")
+public class ClientRunner extends JFrame{
 
+	private String[] names = "Bob Jim Sandra Guy James Joe".split(" ");
+	private Color[] colors = {Color.blue, Color.red, Color.green, Color.orange, Color.cyan};
+	private Player you = null;
 	private boolean waitForAnswer = true;
+	private int serverPort = 255;
+	private UDPClient client;
 
-	public ClientRunner() throws Exception{
-		String name = "Bob";
-		Color color = Color.blue;
-		//etc;
+	public ClientRunner() throws Exception {
 		
-		UDPClient client = new UDPClient("localhost", 25565){
+		client = new UDPClient("localhost", serverPort){
 
 			@Override
 			void receivedPacket(Object object) {
@@ -25,33 +30,60 @@ public class ClientRunner {
 						waitForAnswer = false;
 					}
 					else{
-						
-						if (temp.getReasons()[0] == Reasons.NAME_IN_USE){
-							try {
-								
-								//make a Permant player object and modify it before sending
-								
-								sendObject(new JoinRequest(new Player("Jim", Color.red).getPlayerData()));
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
-						}
-						
+						if (arrayContains(temp.getReasons(), Reasons.NAME_IN_USE))
+							you.setName(getRandomName());
+						if (arrayContains(temp.getReasons(), Reasons.COLOR_IN_USE))
+							you.setColor(getRandomColor());
+						sendObject(new JoinRequest(you.getPlayerData()));
+					}
+				}
+				else if (object instanceof Messages){
+					
+					Messages message = (Messages) object;
+					
+					if (message == Messages.SERVER_CLOSING){
+						close();
 					}
 				}
 			}
 		};
 		
-		
-		//make a Permant player object and modify it before sending
-		client.sendObject(new JoinRequest(new Player(name, color).getPlayerData()));
+		//Get user input here
+		you = new Player(getRandomName(), getRandomColor());
+		client.sendObject(new JoinRequest(you.getPlayerData()));
 		
 		while (waitForAnswer ){
 			Thread.sleep(200);
 		}
-		
 		say("Joined Server");
 		
+	}
+	
+	private boolean arrayContains(Object[] array, Object object){
+		for (Object check : array){
+			if (check.equals(object))
+				return true;
+		}
+		return false;
+	}
+	
+	private String getRandomName(){
+		return names[getRandom(0, names.length)];
+	}
+	
+	private Color getRandomColor(){
+		return colors[getRandom(0, colors.length)];
+	}
+	
+	private int getRandom(int lower, int upper){
+		return new Random().nextInt(upper-lower) + lower;
+	}
+	
+	public void close(){
+		try{
+			client.close();
+		}catch(Exception e){}
+		System.exit(0);
 	}
 
 	private void say(Object s) {
@@ -67,3 +99,4 @@ public class ClientRunner {
 	}
 
 }
+

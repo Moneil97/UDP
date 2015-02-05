@@ -54,19 +54,27 @@ public abstract class UDPClient {
 	}
 	
 	
-	public void sendObject(Object obj) throws IOException{
-		ByteArrayOutputStream bao = new ByteArrayOutputStream();
-		ObjectOutputStream oos = new ObjectOutputStream(bao);
-		
-		oos.flush();
-		oos.writeObject(obj);
-		oos.flush();
-		byte[] buffer = bao.toByteArray();
-
-		DatagramPacket pack = new DatagramPacket(buffer, buffer.length, serverAddress, serverPort);
-		client.send(pack);
+	public void sendObject(Object obj){
+		try{
+			ByteArrayOutputStream bao = new ByteArrayOutputStream();
+			ObjectOutputStream oos = new ObjectOutputStream(bao);
+			
+			oos.flush();
+			oos.writeObject(obj);
+			oos.flush();
+			byte[] buffer = bao.toByteArray();
+	
+			DatagramPacket pack = new DatagramPacket(buffer, buffer.length, serverAddress, serverPort);
+			client.send(pack);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 	
 	abstract void receivedPacket(Object o);
+
+	public void close() {
+		client.close();
+	}
 }
 

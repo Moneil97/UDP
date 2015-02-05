@@ -9,7 +9,7 @@ import java.net.InetAddress;
 
 abstract public class UDPServer {
 
-	private int serverPort = 25565;
+	private int serverPort = 255;
 	private final int MAX_BUFFER_SIZE = 2000;
 	private DatagramSocket server = new DatagramSocket(serverPort);
 	
@@ -33,18 +33,22 @@ abstract public class UDPServer {
 		}).start();
 	}
 	
-	public void sendObject(Object obj, InetAddress address, int port) throws Exception{
-		ByteArrayOutputStream bao = new ByteArrayOutputStream();
-		ObjectOutputStream oos = new ObjectOutputStream(bao);
-		
-		oos.flush();
-		oos.writeObject(obj);
-		say("Sent: " + obj + " to: " + address + "@" + port);
-		oos.flush();
-		byte[] buffer = bao.toByteArray();
-
-		DatagramPacket pack = new DatagramPacket(buffer, buffer.length, address, port);
-		server.send(pack);
+	public void sendObject(Object obj, InetAddress address, int port){
+		try{
+			ByteArrayOutputStream bao = new ByteArrayOutputStream();
+			ObjectOutputStream oos = new ObjectOutputStream(bao);
+			
+			oos.flush();
+			oos.writeObject(obj);
+			say("Sent: " + obj + " to: " + address + "@" + port);
+			oos.flush();
+			byte[] buffer = bao.toByteArray();
+	
+			DatagramPacket pack = new DatagramPacket(buffer, buffer.length, address, port);
+			server.send(pack);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 	
 	private void say(Object s) {
@@ -64,6 +68,10 @@ abstract public class UDPServer {
 	}
 	
 	abstract void receivedPacket(Object o, InetAddress address, int port);
+
+	public void close() {
+		server.close();
+	}
 
 }
 

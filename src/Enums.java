@@ -6,5 +6,9 @@ enum Responses{
 }
 
 enum Reasons{
-	NAME_IN_USE, Color_IN_USE
+	NAME_IN_USE, COLOR_IN_USE
+}
+
+enum Messages{
+	CLIENT_CLOSING, SERVER_CLOSING;
 }
