@@ -4,7 +4,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
-public class ServerRunner {
+import javax.swing.JFrame;
+
+@SuppressWarnings("serial")
+public class ServerRunner extends JFrame{
 
 	private UDPServer server;
 	private HashMap<Connection, Player> otherPlayers = new HashMap<Connection, Player>();
@@ -30,6 +33,7 @@ public class ServerRunner {
 				}
 			}
 		};
+
 	}
 	
 	private void joinRequest(UDPServer server, JoinRequest request, InetAddress address, int port){

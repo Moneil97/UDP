@@ -22,7 +22,7 @@ abstract public class UDPServer {
 			e1.printStackTrace();
 		}
 		
-		System.out.println("Server Running...");
+		System.out.println("Server Running on port: " + server.getLocalPort());
 	
 		//Receive Packets
 		new Thread(new Runnable() {
@@ -38,6 +38,10 @@ abstract public class UDPServer {
 				}
 			}
 		}).start();
+	}
+	
+	public DatagramSocket getDatagramSocket(){
+		return server;
 	}
 	
 	public void sendObject(Object obj, InetAddress address, int port){
