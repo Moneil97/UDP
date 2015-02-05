@@ -1,26 +1,57 @@
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 
-
-abstract public class ObjectServer {
+abstract public class UDPServer {
 
 	private int serverPort = 25565;
 	private final int MAX_BUFFER_SIZE = 2000;
 	private DatagramSocket server = new DatagramSocket(serverPort);
 	
-	public ObjectServer() throws Exception {
+	public UDPServer() throws Exception {
 		
 		System.out.println("Server Running...");
-		
-		while (true){
-			receivedPacket(receiveObject());
-		}
+	
+		//Receive Packets
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				while (true){
+					try {
+						Pack pack = getPacket();
+						receivedPacket(pack.getObject(), pack.getAddress(), pack.getPort());
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}).start();
 	}
 	
-	public Object receiveObject() throws Exception{
+	public void sendObject(Object obj, InetAddress address, int port) throws Exception{
+		ByteArrayOutputStream bao = new ByteArrayOutputStream();
+		ObjectOutputStream oos = new ObjectOutputStream(bao);
+		
+		oos.flush();
+		oos.writeObject(obj);
+		say("Sent: " + obj + " to: " + address + "@" + port);
+		oos.flush();
+		byte[] buffer = bao.toByteArray();
+
+		DatagramPacket pack = new DatagramPacket(buffer, buffer.length, address, port);
+		server.send(pack);
+	}
+	
+	private void say(Object s) {
+		System.out.println(s);
+	}
+
+	private Pack getPacket() throws Exception{
 		byte[] buffer = new byte[MAX_BUFFER_SIZE];
 		DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 		server.receive(packet);
@@ -29,44 +60,47 @@ abstract public class ObjectServer {
 		ObjectInputStream is = new ObjectInputStream(new BufferedInputStream(bais));
 		Object o = is.readObject();
 		is.close();
-		return o;
+		return new Pack(o, packet.getAddress(), packet.getPort());
 	}
 	
-	abstract void receivedPacket(Object o);
-	
-	public static void main(String[] args) throws Exception {
-		new Runner();
-	}
+	abstract void receivedPacket(Object o, InetAddress address, int port);
 
 }
 
-class Runner{
+class Pack{
 	
-	public Runner() throws Exception{
-		
-		new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-				try {
-					ObjectServer server = new ObjectServer(){
-
-						@Override
-						void receivedPacket(Object o) {
-							System.out.println("Server Received: " + o);
-							
-							if (o instanceof JoinRequest){
-								JoinRequest temp = (JoinRequest) o;
-								System.out.println(temp.getName() + " tried joining the server with color: " + temp.getColor());
-							}
-							
-						}
-						
-					};
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}).start();
+	private Object object;
+	private InetAddress address;
+	private int port;
+	
+	public Pack(Object o, InetAddress address, int port){
+		this.object = o;
+		this.address = address;
+		this.port = port;
 	}
+
+	public Object getObject() {
+		return object;
+	}
+
+	public void setObject(Object object) {
+		this.object = object;
+	}
+
+	public InetAddress getAddress() {
+		return address;
+	}
+
+	public void setAddress(InetAddress address) {
+		this.address = address;
+	}
+
+	public int getPort() {
+		return port;
+	}
+
+	public void setPort(int port) {
+		this.port = port;
+	}
+	
 }
