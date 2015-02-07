@@ -21,7 +21,7 @@ public class ServerRunner extends JFrame{
 				System.out.println("Server Received: " + object);
 
 				if (object instanceof JoinRequest) {
-					joinRequest(this, (JoinRequest) object, address, port);
+					receivedJoinRequest(this, (JoinRequest) object, address, port);
 				}
 				else if (object instanceof Messages){
 					
@@ -31,14 +31,31 @@ public class ServerRunner extends JFrame{
 						
 					}
 				}
+				else if (object instanceof PlayerData){
+					receivedPlayerData(this, (PlayerData) object, address, port);
+				}
 			}
 		};
 
 	}
 	
-	private void joinRequest(UDPServer server, JoinRequest request, InetAddress address, int port){
-		PlayerData playerdata = request.getPlayerData();
+	private void receivedPlayerData(UDPServer server, PlayerData newdata, InetAddress address, int port) {
+
+		Player player = otherPlayers.get(new Connection(address, port));
 		
+		if (newdata.packetNumber >= player.getLastPacketNumberReceived()){
+			player.setLastPacketNumberReceived(newdata.packetNumber);
+			//say(player.getLastPacketNumberReceived());
+		}
+		else{
+			say("Throwing out old packet: " + newdata.packetNumber + " Current packet #: " + player.getLastPacketNumberReceived());
+		}
+		
+	}
+
+	private void receivedJoinRequest(UDPServer server, JoinRequest request, InetAddress address, int port){
+		
+		PlayerData playerdata = request.getPlayerData();
 		List<Reasons> denyReasons = new ArrayList<Reasons>();
 		
 		for(Entry<Connection, Player> e :otherPlayers.entrySet()){
@@ -84,7 +101,7 @@ public class ServerRunner extends JFrame{
 }
 
 //Use Connection instead of only address so we can have multiple clients from the same ip address
-class Connection{
+class Connection {
 	
 	private InetAddress address;
 	private int port;
@@ -109,4 +126,16 @@ class Connection{
 	public void setPort(int port) {
 		this.port = port;
 	}
+	
+	@Override
+	public int hashCode(){
+		return (address.hashCode() + port)/port; 
+	}
+	
+	@Override
+	public boolean equals(Object o){
+		Connection other = (Connection) o;
+		return (this.port == other.port && this.address.equals(other.address));
+	}
+
 }

@@ -9,7 +9,30 @@ public class test {
 
 	public test() throws IOException {
 		
-		int port = 255;
+		HeartBeat heart = new HeartBeat();
+		
+		System.out.println(HeartBeat.packetCounter);
+		
+		HeartBeat heart2 = new HeartBeat();
+		
+		System.out.println(HeartBeat.packetCounter);
+		
+		
+		
+//		heart.setPacketCounter(heart.getPacketCounter()+1);
+//		
+//		System.out.println(heart.getPacketCounter());
+//		
+//		TestWrapper wrap = new TestWrapper();
+//		wrap.setPacketCounter(wrap.getPacketCounter()+1);
+//		
+//		heart.setPacketCounter(heart.getPacketCounter()+1);
+//		
+//		System.out.println(heart.getPacketCounter());
+		
+
+		
+		/*int port = 255;
 		
 		DatagramSocket server = new DatagramSocket(port);
 		DatagramSocket client = new DatagramSocket();
@@ -37,7 +60,7 @@ public class test {
 		
 		
 		client.send(new DatagramPacket(buf, buf.length, InetAddress.getByName("localhost"), port));
-		System.out.println(2);
+		System.out.println(2);*/
 		
 //		byte[] buf2 = new byte[1];
 //		System.out.println(3);

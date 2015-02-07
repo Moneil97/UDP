@@ -3,10 +3,12 @@ import java.util.Arrays;
 
 public class Wrappers {}
 
+
+
 //All need to be Serializable
 
 @SuppressWarnings("serial")
-class JoinRequest implements Serializable{
+class JoinRequest extends Wrappers implements Serializable{
 	
 	private PlayerData playerData;
 	
@@ -15,12 +17,12 @@ class JoinRequest implements Serializable{
 	public void setPlayerData(PlayerData playerData) {this.playerData = playerData;}
 	
 	public String toString(){
-		return "{JoinRequest: " + playerData + "}";
+		return "{JoinRequest: " + playerData + " packet#: " + playerData.packetNumber + "}";
 	}
 }
 
 @SuppressWarnings("serial")
-class Answer implements Serializable{
+class Answer extends Wrappers implements Serializable{
 	
 	private Responses response;
 	private Reasons reasons[];
@@ -45,6 +47,23 @@ class Answer implements Serializable{
 }
 
 @SuppressWarnings("serial")
-class HeartBeat implements Serializable{
+class HeartBeat extends Wrappers implements Serializable{
+	
+	//Need static since new Object sent each time
+	//But do i need a counter for heart beat?
+	public static int packetCounter;
+	public int packetNumber;
+	
+	public HeartBeat(){
+		packetNumber = packetCounter++;
+	}
+	
+	public String toString(){
+		return "{Heartbeat packet#:" + packetNumber + "}";
+	}
 	
 }
+
+//class TestWrapper extends Wrappers implements Serializable{
+//	
+//}

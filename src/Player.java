@@ -5,6 +5,7 @@ import java.io.Serializable;
 public class Player {
 
 	private PlayerData data;
+	private int lastPacketNumberReceived = 0; //For Server Use
 	
 	public Player(String name, Color color) {
 		data = new PlayerData(name, color);
@@ -33,19 +34,45 @@ public class Player {
 	public void setColor(Color color) {
 		data.setColor(color);
 	}
+
+	public Player incPacketNum() {
+		data.incPacketNum();
+		return this;
+	}
+
+	//For Server Use Only
+	public void setLastPacketNumberReceived(int packetNumber) {
+		lastPacketNumberReceived = packetNumber;
+	}
+	
+	public int getLastPacketNumberReceived(){
+		return lastPacketNumberReceived;
+	}
+
+//	public PlayerData sendPlayerData() {
+//		data.incPacketNum();
+//		return data;
+//	}
 }
 
 @SuppressWarnings("serial")
 class PlayerData implements Serializable{
 
+	//public static int packetCounter;
+	public int packetNumber;
 	private String name;
 	private Color color;
 	
 	public PlayerData(String name, Color color) {
+		packetNumber = 0;//packetCounter++;
 		this.name = name;
 		this.color = color;
 	}
 	
+	public void incPacketNum() {
+		packetNumber++;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -63,6 +90,6 @@ class PlayerData implements Serializable{
 	}
 	
 	public String toString(){
-		return "{PlayerData: " + name + " " + color + "}";
+		return "{PlayerData: " + name + " " + color + " packet#: " + packetNumber + "}";
 	}
 }

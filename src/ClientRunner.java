@@ -17,6 +17,11 @@ public class ClientRunner extends JFrame{
 
 	public ClientRunner() throws Exception {
 		
+		setSize(400, 400);
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setLocationRelativeTo(null);
+		setVisible(true);
+		
 		client = new UDPClient(ip, serverPort){
 
 			@Override
@@ -58,6 +63,41 @@ public class ClientRunner extends JFrame{
 			Thread.sleep(200);
 		}
 		say("Joined Server");
+		
+		this.add(new GameScreen(this));
+		
+		revalidate();
+		repaint();
+		
+		say("done");
+		
+		
+		SimpleTimer sendHeartbeatTimer = new SimpleTimer(true);
+		sendHeartbeatTimer.setInterval(5);
+		SimpleTimer sendPlayerDataTimer = new SimpleTimer(true);
+		sendPlayerDataTimer.setInterval(1/4.0);
+		SimpleTimer paintTimer = new SimpleTimer(true);
+		paintTimer.setInterval(1/30.0);
+		
+		while (true){
+			
+			if (sendHeartbeatTimer.isReady()){
+				sendHeartbeatTimer.reset();
+				client.sendObject(new HeartBeat());
+			}
+			
+			if (sendPlayerDataTimer.isReady()){
+				sendPlayerDataTimer.reset();
+				client.sendObject(you.incPacketNum().getPlayerData());
+			}
+			if(paintTimer.isReady()){
+				paintTimer.reset();
+				repaint();
+			}
+			
+			Thread.sleep(10);
+			
+		}
 		
 	}
 	
